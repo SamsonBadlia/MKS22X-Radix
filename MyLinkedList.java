@@ -106,6 +106,23 @@ public class MyLinkedList<E>{
     return current;
  }
 
+    public E removeFront(){
+    if( length == 1){
+      E temp = start.getData();
+      start = end = null;
+      length = 0;
+      return temp;
+    }
+    Node temp = start;
+    Node newStart = start.next();
+    start = newStart;
+    newStart.setPrev(null);
+    temp.setNext(null);
+    length--;
+    return temp.getData();
+    }
+
+
  public boolean contains(Integer value){
    Node current = start;
    int count = 0;
