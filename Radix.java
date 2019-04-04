@@ -2,69 +2,49 @@ import java.util.*;
 
 public class Radix{
 
-  public static void radixsort( int[] data ) {
-    @SuppressWarnings("unchecked")
+  public static void radixsort(int[] data){
+    @SuppressWarnings({"unchecked" , "rawtypes"})
     MyLinkedList<Integer>[] buckets = new MyLinkedList[20];
     for (int i = 0; i < 20; i++){
-      if (buckets[i] == null) buckets[i] = new MyLinkedList<Integer>(); //ensures everuything is instantiated
+      buckets[i] = new MyLinkedList<>();
     }
-    int digits = longest(data); //finds how many passes are needed
-    for (int i = 1; i <= digits; i++){
-      for (int j = 0; j < data.length; i++){
-        //getsDigit at that place and then throws into correct
-        int digitAtPlace = getDigit(data[i], i);
-        if ( data[j] >= 0 ) buckets[ digitAtPlace + 10 ].add( data[j] );
-        else buckets[ 9 - digitAtPlace ].add( data[j] );
+    MyLinkedList<Integer> list = new MyLinkedList<>();
 
-        int counter = 0;
-        for(int x = 0; j < 20; x++){
-          int s = buckets[x].size();
-          for(int k = 1; k <= s ; k++){
-            int temp = buckets[x].removeFront();
-            data[counter] = temp;
-            counter++;
-          }
-        }
+    int max = 0;
+    for (int i = 0; i < data.length; i++){
+      if (Math.abs(data[i]) > Math.pow(10, max)) max = (int)Math.ceil(Math.log10(Math.abs(data[i])));
+      list.add(data[i]);
+    }
 
+    int index = 0;
+    while (index < max){
+      while (list.size() > 0){
+        int value = list.removeFront();
+        int digit = (int)(value / Math.pow(10, index)) % 10;
+        if (digit < 0) buckets[9 + digit].add(value);
+        else buckets[10 + digit].add(value);
       }
+      list = buckets[0];
+      for (int i = 1; i < 20; i++){
+        list.extend(buckets[i]);
+      }
+      for (int i = 0; i < 20; i++){
+        buckets[i] = new MyLinkedList<>();
+      }
+      index++;
     }
 
-  }
-
-  public static int getDigit(int num, int i){
-    if ( num < 0) num *= -1;
-    int counter =0;
-    while(num > 0){
-      num = num / 10;
-      counter++;
+    for (int i = 0; i < data.length; i++){
+      data[i] = list.removeFront();
     }
-    if ( i > counter) return 0;
-    if ( num < 0) num *= -1;
-    while( i > 1){
-      num /= 10;
-      i--;
-    }
-    return num % 10;
-  }
-
-  public static int longest(int[] data){
-    int max = Math.abs(data[0]); //starting reference
-    for (int i = 1; i < data.length; i++){
-      if (Math.abs(data[i]) >= max) max = Math.abs(data[i]); //if value at is greater, new largest
-    }
-    int digits = 0; //tracks number of digits for longest number
-    while (max > 0){
-      max /= 10;
-      digits++;
-    }
-    return digits;
+    
   }
 
 
   public static void main(String[]args){
-    System.out.println("Size\t\tMax Value\tquick/builtin ratio ");
-    int[]MAX_LIST = {1000000000,500,10};
-    for(int MAX : MAX_LIST){
+    System.out.println("Size\t\tlongest Value\tquick/builtin ratio ");
+    int[]longest_LIST = {1000000000,500,10};
+    for(int longest : longest_LIST){
       for(int size = 31250; size < 2000001; size*=2){
         long qtime=0;
         long btime=0;
@@ -73,7 +53,7 @@ public class Radix{
           int []data1 = new int[size];
           int []data2 = new int[size];
           for(int i = 0; i < data1.length; i++){
-            data1[i] = (int)(Math.random()*MAX);
+            data1[i] = (int)(Math.random()*longest);
             data2[i] = data1[i];
           }
           long t1,t2;
@@ -90,7 +70,7 @@ public class Radix{
             System.exit(0);
           }
         }
-        System.out.println(size +"\t\t"+MAX+"\t"+1.0*qtime/btime);
+        System.out.println(size +"\t\t"+longest+"\t"+1.0*qtime/btime);
       }
       System.out.println();
     }
