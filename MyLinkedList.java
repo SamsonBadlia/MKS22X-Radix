@@ -1,6 +1,6 @@
 public class MyLinkedList<E>{
 
-    private class Node{
+    public class Node{
      private E data;
      private Node next,prev;
 
@@ -184,14 +184,20 @@ public E removeFirst(){
   return temp;
 }
 
- public void extend(MyLinkedList<E> other){
-     this.end.setNext(other.start);
-     this.end = other.end;
-     this.length = this.length + other.length;
-     other.length = 0;
-     other.end = null;
-     other.start = null;
-
- }
+public void extend(MyLinkedList<E> other){
+      if (size() == 0){
+        start = other.start;
+        end = other.end;
+        length += other.size();
+        other.clear();
+      }
+      else if (other.size() > 0){
+        length += other.size();
+        end.setNext(other.start);
+        other.start.setPrev(end);
+        end = other.end;
+        other.clear();
+      }
+  }
 
 }
